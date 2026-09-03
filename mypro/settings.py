@@ -156,32 +156,8 @@ CSRF_TRUSTED_ORIGINS = [
 # In production, these values are loaded securely from environment variables (.env).
 # Supports RAZORPAY_KEY_ID=rzp_test_... (Test) or rzp_live_... (Live).
 # NEVER commit production secret keys to version control.
-RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID', '')
-RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', '')
+RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID', 'rzp_test_TXXUyjgmwCmyn0')
+RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', 'zHIGx9PR87uemaWkes31yKVP')
 RAZORPAY_CURRENCY = os.getenv('RAZORPAY_CURRENCY', 'INR')
 RAZORPAY_WEBHOOK_SECRET = os.getenv('RAZORPAY_WEBHOOK_SECRET', '')
-
-# LOGGING CONFIGURATION
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'standard': {
-            'format': '[%(asctime)s] %(levelname)s in %(name)s: %(message)s'
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'standard',
-        },
-    },
-    'loggers': {
-        'payment': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-    },
-}
 
