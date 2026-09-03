@@ -10,3 +10,7 @@ python manage.py collectstatic --no-input
 
 # Run database migrations
 python manage.py migrate
+
+# Initialize admin and test reviewer credentials
+python manage.py setup_production_data
+
