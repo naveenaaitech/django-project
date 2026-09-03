@@ -1,127 +1,112 @@
 {% extends 'base.html' %}
 {% block content %}
-{% load static %}
 
-<!-- Header Section -->
-<header class="py-5" style="background-color: #d296de;">
-    <div class="container px-4 px-lg-5 my-5">
-        <div class="text-center text-white">
-            <h1 class="display-4 fw-bolder">SEARCH PRODUCTS</h1>
-            <p class="lead fw-normal text-white-50 mb-0">FIND WHAT YOU ARE LOOKING FOR</p>
-        </div>
-    </div>
-</header>
-
-<div class="container">
-    <div class="row">
-        <center>
-            <div class="col-10">
-                <br><br>
-
-                <!-- Search Card -->
-                <div class="card">
-                    <div class="card-header">
-                        Search Products
+<!-- SEARCH HEADER & INPUT BOX -->
+<section class="py-4" style="background: linear-gradient(135deg, #0b1528 0%, #162a4d 100%);">
+    <div class="container py-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center text-white">
+                
+                <h3 class="fw-bold mb-3"><i class="bi bi-search text-warning me-2"></i>Search Storefront</h3>
+                
+                <!-- Search Form Input -->
+                <form method="GET" action="{% url 'search' %}" class="mb-3">
+                    <div class="input-group input-group-lg shadow-sm">
+                        <input type="text" name="searched" class="form-control border-0 px-4" placeholder="Search by name, category, or keyword (e.g., iPhone, Shoes, Cake)..." value="{{ query }}" autofocus>
+                        <button class="btn btn-swiggy px-4 fw-bold" type="submit">
+                            <i class="bi bi-search me-1"></i> Search
+                        </button>
                     </div>
-                    <div class="card-body">
-                        <form method="POST" action="{% url 'search' %}">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <input type="text" class="form-control"
-                                       placeholder="Search products" name="searched">
-                            </div>
-                            <button type="submit" class="btn btn-secondary">
-                                Search
-                            </button>
-                        </form>
-                    </div>
-                </div>
+                </form>
 
-                <br><br>
-
-                <!-- Search Results Section -->
-                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-
-                    {% if searched %}
-                        {% for product in searched %}
-                        
-                            {% if product.is_sale %}
-                            <div class="col mb-5">
-                                <div class="card h-100">
-
-                                    <!-- Sale Badge -->
-                                    <div class="badge bg-dark text-white position-absolute"
-                                         style="top: 0.5rem; right: 0.5rem">Sale</div>
-
-                                    <!-- Product Image -->
-                                    <img class="card-img-top" src="{{ product.image.url }}" alt="..."
-                                         width="250px" height="250px"/>
-
-                                    <!-- Product Details -->
-                                    <div class="card-body p-4">
-                                        <div class="text-center">
-                                            <h5 class="fw-bolder">{{ product.name }}</h5>
-
-                                            <div class="d-flex justify-content-center small text-warning mb-2">
-                                                <div class="bi-star-fill"></div>
-                                                &nbsp;&nbsp;Sale!&nbsp;&nbsp;
-                                                <div class="bi-star-fill"></div>
-                                            </div>
-
-                                            <strike>${{ product.price }}</strike>
-                                            &nbsp;
-                                            ${{ product.sale_price }}
-                                        </div>
-                                    </div>
-
-                                    <!-- Product Actions -->
-                                    <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                        <div class="text-center">
-                                            <a class="btn btn-outline-dark mt-auto" href="{% url 'product' product.id %}">
-                                                View product
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {% else %}
-
-                            <!-- Product Without Sale -->
-                            <div class="col mb-5">
-                                <div class="card h-100">
-
-                                    <img class="card-img-top" src="{{ product.image.url }}"
-                                         width="300px" height="300px" alt="..."/>
-
-                                    <div class="card-body p-4">
-                                        <div class="text-center">
-                                            <h5 class="fw-bolder">{{ product.name }}</h5>
-                                            ${{ product.price }}
-                                        </div>
-                                    </div>
-
-                                    <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                        <div class="text-center">
-                                            <a class="btn btn-outline-dark mt-auto"
-                                               href="{% url 'product' product.id %}">
-                                                View product
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-
+                <!-- Trending Search Keywords -->
+                <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 small text-white-50">
+                    <span>Popular Searches:</span>
+                    <a href="{% url 'search' %}?searched=Phone" class="badge bg-white bg-opacity-10 text-white text-decoration-none py-2 px-3 rounded-pill">Mobile Phones</a>
+                    <a href="{% url 'search' %}?searched=Shoes" class="badge bg-white bg-opacity-10 text-white text-decoration-none py-2 px-3 rounded-pill">Shoes</a>
+                    <a href="{% url 'search' %}?searched=Cake" class="badge bg-white bg-opacity-10 text-white text-decoration-none py-2 px-3 rounded-pill">Cakes & Bakery</a>
+                    <a href="{% url 'search' %}?searched=Drink" class="badge bg-white bg-opacity-10 text-white text-decoration-none py-2 px-3 rounded-pill">Drinks</a>
                 </div>
 
             </div>
-        </center>
+        </div>
     </div>
+</section>
+
+<!-- SEARCH RESULTS SECTION -->
+<div class="container py-5 mb-5">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <h5 class="fw-bold text-dark mb-0">
+            {% if has_query %}
+                Showing results for "<span class="text-primary">{{ query }}</span>" ({{ searched|length }} item{{ searched|length|pluralize }})
+            {% else %}
+                Explore All Products ({{ searched|length }} items)
+            {% endif %}
+        </h5>
+        {% if has_query %}
+        <a href="{% url 'search' %}" class="btn btn-outline-secondary btn-sm rounded-pill">
+            <i class="bi bi-x-circle me-1"></i> Clear Search
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="row g-4">
+        {% for product in searched %}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="card card-product h-100 position-relative shadow-sm border-0 rounded-4 overflow-hidden bg-white">
+                
+                {% if product.is_sale %}
+                <span class="badge badge-sale position-absolute top-0 start-0 m-3 shadow-sm px-2 py-1">SALE</span>
+                {% endif %}
+
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="bi bi-image text-muted fs-1"></i>
+                </div>
+                {% endif %}
+
+                <div class="card-body p-3 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <h6 class="fw-bold text-dark mb-0 text-truncate" style="max-width: 170px;" title="{{ product.name }}">{{ product.name }}</h6>
+                        <span class="badge bg-success bg-opacity-10 text-success small">★ 4.4</span>
+                    </div>
+                    
+                    <small class="text-muted mb-3">{{ product.category.name|default:'Store' }} • 25 mins</small>
+
+                    <div class="mt-auto pt-2 d-flex justify-content-between align-items-center border-top">
+                        <div>
+                            {% if product.is_sale %}
+                            <div class="text-muted text-decoration-line-through small" style="font-size: 0.75rem;">₹{{ product.price }}</div>
+                            <div class="h5 fw-bold text-danger mb-0">₹{{ product.sale_price }}</div>
+                            {% else %}
+                            <div class="h5 fw-bold text-dark mb-0">₹{{ product.price }}</div>
+                            {% endif %}
+                        </div>
+
+                        <a href="{% url 'cart_add' product.id %}" class="btn btn-outline-success btn-sm px-3 fw-bold rounded-3">
+                            + ADD
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="display-5 text-muted mb-3"><i class="bi bi-search"></i></div>
+            <h4 class="fw-bold text-dark">No products found matching "{{ query }}"</h4>
+            <p class="text-muted">Try searching with a broader keyword like "phone", "shoe", or "cake".</p>
+            <div class="d-flex justify-content-center gap-2 mt-3">
+                <a href="{% url 'search' %}" class="btn btn-outline-dark">View All Products</a>
+                <a href="{% url 'home' %}" class="btn btn-swiggy">Back to Storefront</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
 </div>
 
 {% endblock %}

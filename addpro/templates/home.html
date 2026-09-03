@@ -2,80 +2,138 @@
 {% load static %}
 
 {% block content %}
-<section class="py-5 text-center bg-light shadow-sm">
-    <div class="container">
-        <h1 class="display-4 fw-bold">Welcome to Shoppy</h1>
-        <p class="lead text-muted">Discover amazing products with great prices</p>
-        <a href="#products" class="btn btn-dark btn-lg mt-3">Shop Now</a>
+
+<!-- HERO BANNER -->
+<section class="py-5" style="background: linear-gradient(135deg, #0b1528 0%, #162a4d 100%);">
+    <div class="container py-3">
+        <div class="row align-items-center g-4">
+            
+            <div class="col-lg-7 text-white">
+                <span class="badge px-3 py-2 rounded-pill fw-semibold mb-3" style="background-color: rgba(252, 128, 25, 0.2); color: #fc8019; border: 1px solid rgba(252, 128, 25, 0.4);">
+                    <i class="bi bi-lightning-charge-fill me-1"></i> Superfast 25-Min Delivery
+                </span>
+
+                <h1 class="display-4 fw-extrabold mb-3" style="font-weight: 800; letter-spacing: -1px;">
+                    Order Online.<br>
+                    <span style="color: #fc8019;">Pay Instantly with UPI & Cards.</span>
+                </h1>
+
+                <p class="lead text-white-50 mb-4 pe-lg-4" style="font-size: 1.1rem;">
+                    Browse our curated catalog of smartphones, footwear, cakes, and beverages. Experience seamless Razorpay checkout and live order tracking.
+                </p>
+
+                <!-- Search Bar -->
+                <form method="GET" action="{% url 'search' %}" class="d-flex gap-2 mb-3 pe-lg-4">
+                    <div class="input-group input-group-lg shadow-sm">
+                        <input type="text" name="searched" class="form-control border-0 px-4" placeholder="Search phones, shoes, cakes, drinks..." required>
+                        <button class="btn btn-swiggy px-4" type="submit">
+                            <i class="bi bi-search me-1"></i> Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card p-4 text-white shadow-lg border-0 rounded-4" style="background-color: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-success px-3 py-2 rounded-pill">LIVE ENGINE</span>
+                        <small class="text-white-50">Razorpay Digital Payments</small>
+                    </div>
+                    <h5 class="fw-bold mb-2">Accepted Payment Modes</h5>
+                    <div class="d-flex flex-wrap gap-2 text-white-50 small mb-3">
+                        <span class="badge bg-light text-dark py-2 px-3">Google Pay</span>
+                        <span class="badge bg-light text-dark py-2 px-3">PhonePe</span>
+                        <span class="badge bg-light text-dark py-2 px-3">Paytm UPI</span>
+                        <span class="badge bg-light text-dark py-2 px-3">Credit/Debit Cards</span>
+                        <span class="badge bg-light text-dark py-2 px-3">Cash on Delivery</span>
+                    </div>
+                    <div class="p-2 rounded bg-black bg-opacity-25 small text-white-50 font-monospace">
+                        ⚡ Instant HMAC-SHA256 Cryptographic Verification
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 </section>
 
-<div class="container py-5" id="products">
-    <h2 class="text-center mb-5">Our Products</h2>
+<!-- CATEGORY PILLS BAR -->
+<div class="container mt-4 mb-3">
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+        <span class="fw-bold text-dark me-2">Quick Filter:</span>
+        <a href="{% url 'home' %}" class="btn btn-dark btn-sm rounded-pill px-3">All Items</a>
+        <a href="{% url 'mobiles' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3"><i class="bi bi-phone me-1"></i> Mobile Phones</a>
+        <a href="{% url 'shoes' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3"><i class="bi bi-tag me-1"></i> Shoes</a>
+        <a href="{% url 'cakes' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3"><i class="bi bi-cake2 me-1"></i> Cakes & Bakery</a>
+        <a href="{% url 'drinks' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3"><i class="bi bi-cup-straw me-1"></i> Drinks</a>
+    </div>
+</div>
+
+<!-- PRODUCT CATALOG -->
+<div class="container py-4 mb-5" id="products">
     <div class="row g-4">
         {% for product in products %}
-        <div class="col-md-3 col-sm-6">
-            <div class="card shadow-sm h-100">
-
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="card card-product h-100 position-relative">
+                
                 {% if product.is_sale %}
-                <span class="badge bg-danger position-absolute m-2">SALE</span>
+                <span class="badge badge-sale position-absolute top-0 start-0 m-3 shadow-sm px-2 py-1">SALE</span>
                 {% endif %}
 
-                <img src="{{ product.image.url }}" class="card-img-top" style="height:250px; object-fit:cover;">
-
-                <div class="card-body text-center">
-                    <h5>{{ product.name }}</h5>
-
-                    {% if product.is_sale %}
-                    <p class="fw-bold text-danger">
-                        <strike>${{ product.price }}</strike> ${{ product.sale_price }}
-                    </p>
-                    {% else %}
-                    <p class="fw-bold">${{ product.price }}</p>
-                    {% endif %}
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="bi bi-image text-muted fs-1"></i>
                 </div>
+                {% endif %}
 
-                <div class="card-footer text-center bg-white">
-                    <a href="{% url 'product' product.id %}" class="btn btn-outline-dark btn-sm">View</a>
-                    <button class="btn btn-outline-danger wishlist-btn" data-product="{{ product.id }}">
-                        ❤️ Wishlist
-                    </button>
+                <div class="card-body p-3 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <h6 class="fw-bold text-dark mb-0 text-truncate" style="max-width: 170px;" title="{{ product.name }}">{{ product.name }}</h6>
+                        <span class="badge bg-success bg-opacity-10 text-success small">★ 4.4</span>
+                    </div>
+                    
+                    <small class="text-muted mb-3">{{ product.category.name|default:'General' }} • 25 mins</small>
 
-                    <a href="{% url 'cart_add' product.id %}" class="btn btn-dark btn-sm">Add to Cart</a>
+                    <div class="mt-auto pt-2 d-flex justify-content-between align-items-center border-top">
+                        <div>
+                            {% if product.is_sale %}
+                            <div class="text-muted text-decoration-line-through small" style="font-size: 0.75rem;">₹{{ product.price }}</div>
+                            <div class="h5 fw-bold text-danger mb-0">₹{{ product.sale_price }}</div>
+                            {% else %}
+                            <div class="h5 fw-bold text-dark mb-0">₹{{ product.price }}</div>
+                            {% endif %}
+                        </div>
+
+                        <a href="{% url 'cart_add' product.id %}" class="btn btn-outline-success btn-sm px-3 fw-bold rounded-3">
+                            + ADD
+                        </a>
+                    </div>
                 </div>
 
             </div>
         </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <h5 class="text-muted">No products available in this category.</h5>
+            <a href="{% url 'home' %}" class="btn btn-swiggy mt-3">View All Products</a>
+        </div>
         {% endfor %}
     </div>
 </div>
-<script>
 
-    $(document).on('click', '.add-wishlist-btn', function (e) {
-        e.preventDefault();
-
-        let product_id = $(this).val();
-
-        $.ajax({
-            type: 'POST',
-            url: "{% url 'wishlist_add' %}",
-            data: {
-                product_id: product_id,
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                action: 'post'
-            },
-            success: function (json) {
-                // Increase count in navbar
-                document.getElementById("wishlist_quantity").textContent = json.qty;
-
-                alert(json.message);
-            },
-            error: function () {
-                alert("Something went wrong!");
-            }
-        });
-    });
-</script>
-
+<!-- SWIGGY-STYLE FLOATING CART NOTIFICATION (IF CART HAS ITEMS) -->
+{% if cart_count and cart_count > 0 %}
+<a href="{% url 'cart_summary' %}" class="floating-cart-bar">
+    <div>
+        <div class="fw-bold">{{ cart_count }} Item{% if cart_count > 1 %}s{% endif %} Added</div>
+        <small class="opacity-75">Proceed to Checkout</small>
+    </div>
+    <div class="fw-bold fs-6">
+        View Cart <i class="bi bi-arrow-right ms-1"></i>
+    </div>
+</a>
+{% endif %}
 
 {% endblock %}

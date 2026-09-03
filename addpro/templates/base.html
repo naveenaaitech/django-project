@@ -5,134 +5,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Commerce Store</title>
+    <title>FinPayCommerce - Fast Commerce & Digital Payments</title>
 
+    <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #fc8019; /* Swiggy Orange */
+            --primary-dark: #e26e10;
+            --dark-navy: #0b1528;
+            --card-radius: 16px;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f3f5f9;
+            color: #1e293b;
+        }
+        .navbar-swiggy {
+            background-color: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid #edf2f7;
+        }
+        .btn-swiggy {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #ffffff;
+            font-weight: 700;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        .btn-swiggy:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+        .badge-sale {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+            font-weight: 700;
+            border-radius: 6px;
+        }
+        .card-product {
+            border: 1px solid #eef2f6;
+            border-radius: var(--card-radius);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
+            background: #ffffff;
+        }
+        .card-product:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+        }
+        /* Sticky bottom floating cart */
+        .floating-cart-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1050;
+            background-color: #60b246; /* Swiggy Green */
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(96, 178, 70, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 320px;
+            max-width: 500px;
+            text-decoration: none;
+        }
+        .floating-cart-bar:hover {
+            color: white;
+            background-color: #529d3b;
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'home' %}">SHOPPY</a>
+    <!-- TOP ANNOUNCEMENT BANNER -->
+    <div class="bg-dark text-white text-center py-2 small" style="background: linear-gradient(90deg, #0b1528, #162a4d);">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-lightning-charge-fill text-warning me-1"></i> <strong>FinPay Delivery:</strong> Superfast delivery in 20-30 mins</span>
+            <span class="d-none d-md-inline text-white-50"><i class="bi bi-shield-check text-info me-1"></i> Razorpay Payment Gateway Active</span>
+        </div>
+    </div>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+    <!-- MAIN NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-swiggy py-3 sticky-top">
+        <div class="container">
+            
+            <!-- BRAND -->
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4 text-dark text-decoration-none" href="{% url 'home' %}">
+                <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px; background-color: var(--primary-color);">
+                    <i class="bi bi-bag-heart-fill fs-5"></i>
+                </div>
+                <span>FinPay<span style="color: var(--primary-color);">Commerce</span></span>
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navMenu">
-                <ul class="navbar-nav ms-auto">
-
-                    <li class="nav-item"><a href="{% url 'home' %}" class="nav-link">Home</a></li>
-
-                    {% if user.is_authenticated %}
-                    <li class="nav-item"><a href="{% url 'cart_summary' %}" class="nav-link">My Cart</a></li>
-                    <li class="nav-item"><a href="{% url 'logout' %}" class="nav-link">Logout</a></li>
-                    {% else %}
-                    <li class="nav-item"><a href="{% url 'login' %}" class="nav-link">Login</a></li>
-                    <li class="nav-item"><a href="{% url 'register' %}" class="nav-link">Register</a></li>
-                    {% endif %}
+                
+                <!-- Center Links -->
+                <ul class="navbar-nav me-auto ms-lg-4 mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a href="{% url 'home' %}" class="nav-link px-3 fw-semibold text-dark">Home</a>
+                    </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button"
-                            data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle px-3 fw-semibold text-dark" href="#" id="catDrop" role="button" data-bs-toggle="dropdown">
                             Categories
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'mobiles' %}">Mobile Phones</a></li>
-                            <li><a class="dropdown-item" href="{% url 'shoes' %}">Shoes</a></li>
-                            <li><a class="dropdown-item" href="{% url 'cakes' %}">Cakes</a></li>
-                            <li><a class="dropdown-item" href="{% url 'drinks' %}">Drinks</a></li>
+                        <ul class="dropdown-menu shadow border-0 rounded-3">
+                            <li><a class="dropdown-item py-2" href="{% url 'mobiles' %}"><i class="bi bi-phone me-2 text-primary"></i> Mobile Phones</a></li>
+                            <li><a class="dropdown-item py-2" href="{% url 'shoes' %}"><i class="bi bi-tag me-2 text-success"></i> Shoes</a></li>
+                            <li><a class="dropdown-item py-2" href="{% url 'cakes' %}"><i class="bi bi-cake2 me-2 text-danger"></i> Cakes & Bakery</a></li>
+                            <li><a class="dropdown-item py-2" href="{% url 'drinks' %}"><i class="bi bi-cup-straw me-2 text-warning"></i> Drinks & Beverages</a></li>
                         </ul>
                     </li>
-
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'search' %}">Search</a>
+                        <a href="{% url 'search' %}" class="nav-link px-3 fw-semibold text-dark"><i class="bi bi-search me-1"></i> Search</a>
                     </li>
-
+                    <li class="nav-item">
+                        <a href="{% url 'about' %}" class="nav-link px-3 fw-semibold text-dark">About</a>
+                    </li>
                 </ul>
-                <li class="nav-item me-2">
-                    <a href="{% url 'cart_summary' %}" class="btn btn-outline-light position-relative">
-                        🛒 Cart
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            {{ cart_count }}
-                        </span>
-                    </a>
-                </li>
-                <a href="{% url 'wishlist_summary' %}" class="btn btn-outline-dark text-white ms-2">
-                    Wishlist
-                    <span class="badge bg-dark text-white ms-1 rounded-pill">
-                        {{ wishlist_count }}
-                    </span>
 
-                </a>
+                <!-- Right Action Buttons -->
+                <div class="d-flex align-items-center gap-2">
+                    
+                    <!-- Cart Button -->
+                    <a href="{% url 'cart_summary' %}" class="btn btn-outline-dark rounded-pill btn-sm px-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-cart3"></i>
+                        <span class="fw-bold">Cart</span>
+                        <span class="badge rounded-pill" style="background-color: var(--primary-color);">{{ cart_count|default:0 }}</span>
+                    </a>
+
+                    <!-- User Account / Profile -->
+                    {% if user.is_authenticated %}
+                    <div class="dropdown ms-1">
+                        <button class="btn btn-dark rounded-pill dropdown-toggle btn-sm px-3 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle text-warning"></i>
+                            <span>{{ user.username|title }}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2">
+                            <li><a class="dropdown-item py-2" href="{% url 'customer_dashboard' %}"><i class="bi bi-bag-check text-primary me-2"></i> My Orders & Tracking</a></li>
+                            <li><a class="dropdown-item py-2" href="{% url 'admin_dashboard' %}"><i class="bi bi-speedometer2 text-warning me-2"></i> Admin Operations</a></li>
+                            <li><a class="dropdown-item py-2" href="/admin/" target="_blank"><i class="bi bi-database me-2"></i> Django Admin</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2 text-danger" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-swiggy rounded-pill btn-sm px-3">Sign Up</a>
+                    {% endif %}
+
+                </div>
 
             </div>
-
         </div>
     </nav>
 
-    <div style="min-height: 80vh;">
+    <!-- SYSTEM MESSAGES -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm rounded-3" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- MAIN BODY -->
+    <div style="min-height: 85vh;">
         {% block content %}
         {% endblock %}
     </div>
 
-    <footer class="bg-dark text-center text-white p-3">
-        © {{ now|date:"Y" }} Shoppy | All Rights Reserved
+    <!-- FOOTER -->
+    <footer class="bg-dark text-white py-5 mt-5 border-top" style="background-color: #0b1528 !important;">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <h5 class="fw-bold d-flex align-items-center gap-2 mb-3">
+                        <span style="color: var(--primary-color);">FinPay</span>Commerce
+                    </h5>
+                    <p class="text-white-50 small pe-lg-4">
+                        Modern e-commerce platform integrated with Razorpay digital payment gateway. Supports live UPI, Google Pay, PhonePe, Cards, NetBanking, and Cash on Delivery with end-to-end cryptographic verification.
+                    </p>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <h6 class="text-white fw-bold mb-3">Store Navigation</h6>
+                    <ul class="list-unstyled text-white-50 small">
+                        <li class="mb-2"><a href="{% url 'home' %}" class="text-white-50 text-decoration-none">All Products</a></li>
+                        <li class="mb-2"><a href="{% url 'customer_dashboard' %}" class="text-white-50 text-decoration-none">Live Order Tracker</a></li>
+                        <li class="mb-2"><a href="{% url 'cart_summary' %}" class="text-white-50 text-decoration-none">Shopping Cart</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-6">
+                    <h6 class="text-white fw-bold mb-3">Payment Engine</h6>
+                    <ul class="list-unstyled text-white-50 small">
+                        <li class="mb-2">🔒 Razorpay Test Mode / Live Mode Ready</li>
+                        <li class="mb-2">⚡ Smallest Currency Unit (Paise) Conversion</li>
+                        <li class="mb-2">🛡️ Server-Side HMAC-SHA256 Verification</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-secondary my-4">
+            <div class="d-flex justify-content-between align-items-center small text-white-50">
+                <span>© {% now "Y" %} FinPayCommerce | Fast Commerce Demonstration</span>
+                <span>Powered by Django & Razorpay</span>
+            </div>
+        </div>
     </footer>
-    <!-- jQuery (needed for cart JS) -->
+
+    <!-- jQuery & Bootstrap Bundle -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Your custom JS (currently empty, but fine) -->
     <script src="{% static 'js/scripts.js' %}"></script>
 </body>
-
 </html>
-
-<script>
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    const csrftoken = getCookie('csrftoken');
-        $(document).on('click', '.wishlist-btn', function (e) {
-        e.preventDefault();
-
-        let productID = $(this).data('product');
-
-        $.ajax({
-            type: 'POST',
-            url: "{% url 'wishlist_add' %}",
-            headers: {
-                'X-CSRFToken': csrftoken
-            },
-            data: {
-                product_id: productID
-            },
-            success: function (response) {
-                console.log(response);
-
-                // update navbar wishlist count
-                $('.wishlist-count').text(response.qty);
-
-                alert("Added to wishlist ❤️");
-            },
-            error: function (xhr) {
-                console.log("Wishlist error", xhr.responseText);
-            }
-        });
-    });
-</script>

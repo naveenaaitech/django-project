@@ -1,23 +1,54 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-4">
-    <h2 class="text-center fw-bold mb-4">Drinks</h2>
 
-    <div class="row">
+<header class="bg-dark text-white py-4 mb-4 shadow-sm" style="background: linear-gradient(135deg, #09172e 0%, #0d2346 100%);">
+    <div class="container">
+        <h2 class="fw-bold mb-1"><i class="bi bi-cup-straw text-info me-2"></i> Drinks</h2>
+        <p class="text-white-50 mb-0">Browse our verified catalog of Drinks</p>
+    </div>
+</header>
+
+<div class="container mb-5">
+    <div class="row g-4">
         {% for product in products %}
-        <div class="col-md-3 mb-4">
-            <div class="card shadow-sm">
-                <img src="{{ product.image.url }}" class="card-img-top" height="250">
-                <div class="card-body text-center">
-                    <h5 class="fw-bold">{{ product.name }}</h5>
-                    <p class="text-dark">${{ product.price }}</p>
-                    <a href="{% url 'product' product.id %}" class="btn btn-dark btn-sm">View Product</a>
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 overflow-hidden position-relative">
+                {% if product.is_sale %}
+                <span class="badge bg-danger position-absolute top-0 start-0 m-3 shadow-sm px-2 py-1">SALE</span>
+                {% endif %}
+
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 220px; object-fit: cover;">
+                {% endif %}
+
+                <div class="card-body p-3 d-flex flex-column">
+                    <h6 class="fw-bold text-dark mb-1 text-truncate" title="{{ product.name }}">{{ product.name }}</h6>
+                    <small class="text-muted mb-2">Drinks</small>
+
+                    <div class="mt-auto pt-2 d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if product.is_sale %}
+                            <div class="text-muted text-decoration-line-through small">₹{{ product.price }}</div>
+                            <div class="h5 fw-bold text-danger mb-0">₹{{ product.sale_price }}</div>
+                            {% else %}
+                            <div class="h5 fw-bold text-dark mb-0">₹{{ product.price }}</div>
+                            {% endif %}
+                        </div>
+
+                        <a href="{% url 'cart_add' product.id %}" class="btn btn-primary btn-sm px-3 fw-semibold shadow-sm d-flex align-items-center gap-1">
+                            <i class="bi bi-cart-plus"></i> Add
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
         {% empty %}
-        <h4 class="text-center text-danger">No Jordan products available.</h4>
+        <div class="col-12 text-center py-5">
+            <h5 class="text-muted">No products found in Drinks.</h5>
+            <a href="{% url 'home' %}" class="btn btn-primary mt-3">Back to Store</a>
+        </div>
         {% endfor %}
     </div>
 </div>
+
 {% endblock %}

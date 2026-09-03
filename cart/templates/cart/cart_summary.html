@@ -1,161 +1,126 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
-<header class="sri py-5">
-    <div class="container px-4 px-lg-5 my-5 text-center text-white">
-        <h1 class="display-4 fw-bolder">Shopping Cart</h1>
-        <p class="lead fw-normal text-white-50 mb-0">Your cart items</p>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h2 class="fw-bold mb-1 text-dark"><i class="bi bi-cart3 text-primary me-2"></i>Shopping Cart</h2>
+            <p class="text-muted mb-0">Review items in your cart before checkout</p>
+        </div>
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Continue Shopping
+        </a>
     </div>
-</header>
 
-<br>
-
-<div class="container">
-
-{% if cart_items %}
-    {% for item in cart_items %}
-    <div class="card mb-3 p-3">
-        <div class="row g-0">
-
-            <!-- image -->
-            <div class="col-md-4">
-                <img src="{{ item.product.image.url }}"
-                     class="img-fluid rounded-start"
-                     style="width:200px;">
-            </div>
-
-            <!-- details + buttons -->
-            <div class="col-md-8">
-                <h4>{{ item.product.name }}</h4>
-
-                <p>
-                    Price: ₹<span id="price-{{ item.product.id }}">{{ item.product.price }}</span>
-                </p>
-                <p>
-                    Line total:
-                    ₹<span id="total-{{ item.product.id }}">{{ item.total }}</span>
-                </p>
-
-                <!-- quantity controls -->
-                <div class="d-flex align-items-center mb-2">
-
-                    <button class="btn btn-outline-secondary btn-sm decrement"
-                            data-index="{{ item.product.id }}">-</button>
-
-                    <span id="qty-{{ item.product.id }}" class="mx-2 fw-bold">
-                        {{ item.qty }}
-                    </span>
-
-                    <button class="btn btn-outline-secondary btn-sm increment"
-                            data-index="{{ item.product.id }}">+</button>
-
-                    <button class="btn btn-secondary ms-3 update-cart"
-                            data-index="{{ item.product.id }}">
-                        Update
-                    </button>
-
-                    <button class="btn btn-danger ms-3 delete-product"
-                            data-index="{{ item.product.id }}">
-                        Delete
-                    </button>
+    {% if cart_items %}
+    <div class="row g-4">
+        
+        <!-- Cart Items Column -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="fw-bold mb-0 text-dark">Cart Items ({{ cart_items|length }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light small">
+                                <tr>
+                                    <th scope="col" class="ps-4">Product</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col" class="text-center">Quantity</th>
+                                    <th scope="col">Subtotal</th>
+                                    <th scope="col" class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            {% if item.product.image %}
+                                            <img src="{{ item.product.image.url }}" class="rounded me-3 shadow-sm" style="width: 65px; height: 65px; object-fit: cover;">
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="fw-bold text-dark mb-0">{{ item.product.name }}</h6>
+                                                <small class="text-muted">{{ item.product.category.name|default:'General' }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-semibold text-dark">
+                                        ₹{{ item.price }}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{% url 'cart_decrement' item.product.id %}" class="btn btn-outline-secondary px-2 fw-bold" title="Decrease Quantity">-</a>
+                                            <span class="btn btn-light disabled px-3 fw-bold text-dark border">{{ item.qty }}</span>
+                                            <a href="{% url 'cart_increment' item.product.id %}" class="btn btn-outline-secondary px-2 fw-bold" title="Increase Quantity">+</a>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold text-primary">
+                                        ₹{{ item.total }}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{% url 'cart_remove' item.product.id %}" class="btn btn-outline-danger btn-sm px-2 py-1" title="Remove Item" onclick="return confirm('Remove this item from your cart?');">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-            
+        </div>
+
+        <!-- Order Summary Card -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 90px;">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-receipt me-2"></i>Order Summary</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between mb-2 text-muted">
+                        <span>Items Subtotal:</span>
+                        <span class="fw-semibold text-dark">₹{{ totals }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 text-muted">
+                        <span>Shipping & Delivery:</span>
+                        <span class="text-success fw-bold">FREE</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="h5 fw-bold mb-0">Total Amount:</span>
+                        <span class="h4 fw-bold text-primary mb-0">₹{{ totals }}</span>
+                    </div>
+
+                    <!-- Proceed to Checkout -->
+                    <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg w-100 fw-bold py-3 shadow d-flex align-items-center justify-content-center gap-2" style="border-radius: 10px;">
+                        <span>Proceed to Checkout</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
+                    <div class="text-center mt-3 text-muted small">
+                        <i class="bi bi-shield-check text-success me-1"></i> Secure Checkout | Razorpay & COD
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% else %}
+    <div class="card text-center py-5 border-0 shadow-sm">
+        <div class="display-4 text-muted mb-3"><i class="bi bi-cart-x"></i></div>
+        <h3 class="fw-bold text-dark mb-2">Your Shopping Cart is Empty</h3>
+        <p class="text-muted mb-4">You haven't added any products to your cart yet.</p>
+        <div>
+            <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-bag-plus me-2"></i> Start Shopping
+            </a>
         </div>
     </div>
-    {% endfor %}
-{% else %}
-    <h3 class="text-center text-danger mt-5">
-        You haven't added any items yet.
-    </h3>
-{% endif %}
-
+    {% endif %}
 </div>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<!-- ===== SCRIPTS FOR DELETE / UPDATE / +/- ===== -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-<script>
-    function updateLineTotal(productID) {
-        let price = parseFloat($('#price-' + productID).text());
-        let qty = parseInt($('#qty-' + productID).text());
-        let total = price * qty;
-        $('#total-' + productID).text(total);
-    }
-
-    // INCREMENT
-    $(document).on('click', '.increment', function(){
-        let productID = $(this).data('index');
-        let qty = parseInt($('#qty-' + productID).text());
-        qty++;
-        $('#qty-' + productID).text(qty);
-        updateLineTotal(productID);
-    });
-
-    // DECREMENT
-    $(document).on('click', '.decrement', function(){
-        let productID = $(this).data('index');
-        let qty = parseInt($('#qty-' + productID).text());
-        if (qty > 1) {
-            qty--;
-            $('#qty-' + productID).text(qty);
-            updateLineTotal(productID);
-        }
-    });
-    // UPDATE cart (AJAX)
-    $(document).on('click', '.update-cart', function (e) {
-        e.preventDefault();
-
-        let productID = $(this).data('index');
-        let qty = $('#qty-' + productID).text().trim();
-
-        $.ajax({
-            type: 'POST',
-            url: "{% url 'cart_update' %}",
-            headers: {
-                'X-CSRFToken': csrftoken
-            },
-            data: {
-                product_id: productID,
-                product_qty: qty,
-            },
-            success: function (response) {
-                console.log("UPDATED", response);
-                location.reload();
-            },
-            error: function (xhr) {
-                console.log("Update failed", xhr.responseText);
-            }
-        });
-    });
-
-
-    // DELETE cart item (AJAX)
-    $(document).on('click', '.delete-product', function (e) {
-        e.preventDefault();
-
-        let productID = $(this).data('index');
-
-        $.ajax({
-            type: 'POST',
-            url: "{% url 'cart_delete' %}",
-            headers: {
-                'X-CSRFToken': csrftoken
-            },
-            data: {
-                product_id: productID,
-            },
-            success: function (response) {
-                console.log("DELETED", response);
-                location.reload();
-            },
-            error: function (xhr) {
-                console.log("Delete failed", xhr.responseText);
-            }
-        });
-    });
-
-</script>
 {% endblock %}

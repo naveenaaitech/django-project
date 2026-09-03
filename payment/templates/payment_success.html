@@ -1,10 +1,147 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-5">
-    <div class="alert alert-success text-center">
-        <h2>Order Placed Successfully 🎉</h2>
-        <p>Your payment was completed. Thank you for shopping with us!</p>
-        <a href="{% url 'home' %}" class="btn btn-primary mt-3">Go Back to Home</a>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            <!-- Live Order Tracking Card -->
+            <div class="card shadow border-0 rounded-4 overflow-hidden mb-4 bg-white">
+                
+                <!-- Status Top Bar -->
+                <div class="p-4 text-white text-center" style="background: linear-gradient(135deg, #60b246, #489332);">
+                    <div class="display-5 mb-1"><i class="bi bi-check-circle-fill"></i></div>
+                    <h3 class="fw-bold mb-1">Order Confirmed!</h3>
+                    <p class="mb-0 text-white-70">Estimated Delivery: <strong>25 - 30 mins</strong></p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    
+                    <!-- SWIGGY LIVE TRACKER PROGRESS BAR -->
+                    <h6 class="fw-bold text-dark mb-3"><i class="bi bi-truck text-warning me-2"></i>Live Order Status</h6>
+
+                    <div class="p-4 bg-light rounded-4 mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3 text-center position-relative">
+                            
+                            <!-- Step 1: Placed -->
+                            <div>
+                                <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto mb-1 shadow-sm" style="width: 38px; height: 38px;">
+                                    <i class="bi bi-check-lg"></i>
+                                </div>
+                                <small class="fw-bold d-block text-success">Order Placed</small>
+                            </div>
+
+                            <!-- Step 2: Payment -->
+                            <div>
+                                <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto mb-1 shadow-sm" style="width: 38px; height: 38px;">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <small class="fw-bold d-block text-success">Payment Verified</small>
+                            </div>
+
+                            <!-- Step 3: Packing -->
+                            <div>
+                                <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center mx-auto mb-1 shadow-sm" style="width: 38px; height: 38px;">
+                                    <i class="bi bi-box-seam"></i>
+                                </div>
+                                <small class="fw-bold d-block text-warning-emphasis">Packing Order</small>
+                            </div>
+
+                            <!-- Step 4: Delivery -->
+                            <div>
+                                <div class="rounded-circle bg-light border text-muted d-flex align-items-center justify-content-center mx-auto mb-1" style="width: 38px; height: 38px;">
+                                    <i class="bi bi-bicycle"></i>
+                                </div>
+                                <small class="text-muted d-block">On the Way</small>
+                            </div>
+
+                        </div>
+
+                        <!-- Delivery Partner Info -->
+                        <div class="d-flex align-items-center justify-content-between p-3 bg-white rounded-3 border">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                                    <i class="bi bi-person-badge-fill fs-5"></i>
+                                </div>
+                                <div>
+                                    <strong class="text-dark d-block">Ramesh Kumar (Delivery Partner)</strong>
+                                    <small class="text-muted"><i class="bi bi-star-fill text-warning"></i> 4.9 Rating • Contactless Delivery</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">Assigned</span>
+                        </div>
+                    </div>
+
+                    <!-- ORDER RECEIPT DETAILS -->
+                    <h6 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                        <i class="bi bi-receipt me-2 text-primary"></i>Receipt Summary
+                    </h6>
+
+                    <div class="table-responsive mb-4 small">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="text-muted" style="width: 40%;">Order Code:</td>
+                                    <td class="fw-bold text-dark">
+                                        <span class="badge bg-dark fs-6">{{ order.order_code }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Transaction ID:</td>
+                                    <td><code>{{ transaction.transaction_id }}</code></td>
+                                </tr>
+                                {% if transaction.razorpay_payment_id %}
+                                <tr>
+                                    <td class="text-muted">Razorpay Payment ID:</td>
+                                    <td><code class="text-primary fw-bold">{{ transaction.razorpay_payment_id }}</code></td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <td class="text-muted">Payment Mode:</td>
+                                    <td><span class="badge bg-secondary">{{ transaction.payment_method }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Amount Paid:</td>
+                                    <td class="fw-bold text-success fs-5">₹{{ order.amount_paid }} INR</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Order Status:</td>
+                                    <td>
+                                        {% if order.order_status == 'PAID' %}
+                                            <span class="badge bg-success">PAID</span>
+                                        {% elif order.order_status == 'PROCESSING' %}
+                                            <span class="badge bg-info text-dark">PROCESSING (COD)</span>
+                                        {% else %}
+                                            <span class="badge bg-primary">{{ order.get_order_status_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% if order.paid_at %}
+                                <tr>
+                                    <td class="text-muted">Payment Timestamp:</td>
+                                    <td class="text-dark">{{ order.paid_at|date:"d M Y, h:i:s A e" }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center pt-3 border-top">
+                        <a href="{% url 'customer_dashboard' %}" class="btn btn-outline-dark px-4 py-2 fw-semibold">
+                            <i class="bi bi-clock-history me-1"></i> Track All Orders
+                        </a>
+                        <a href="{% url 'home' %}" class="btn btn-swiggy px-4 py-2 fw-bold">
+                            <i class="bi bi-bag me-1"></i> Continue Shopping
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
     </div>
 </div>
+
 {% endblock %}

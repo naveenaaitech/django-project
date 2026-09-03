@@ -1,44 +1,204 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<header class="bg-dark py-5">
-    <div class="container text-center text-white">
-        <h1>Billing Information</h1>
-    </div>
-</header>
-<br/>
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 offset-md-3">
-
-            <!-- Shipping Info Display -->
-            <div class="card mb-4">
-                <div class="card-header">Shipping Info</div>
-                <div class="card-body">
-                    Name: {{ shipping_info.shipping_full_name }} <br/>
-                    Email: {{ shipping_info.shipping_email }} <br/>
-                    Address1: {{ shipping_info.shipping_address1 }} <br/>
-                    City: {{ shipping_info.shipping_city }} <br/>
-                    State: {{ shipping_info.shipping_state }} <br/>
-                    Country: {{ shipping_info.shipping_country }} <br/>
+<div class="container py-4 mb-5">
+    
+    <div class="row g-4 justify-content-center">
+        
+        <!-- LEFT COLUMN: PAYMENT OPTIONS (SWIGGY-STYLE) -->
+        <div class="col-lg-7">
+            
+            <!-- Address Card -->
+            <div class="card shadow-sm border-0 rounded-4 p-3 mb-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-geo-alt-fill text-danger fs-5"></i>
+                        <strong class="text-dark">Delivery Address (25-30 Mins)</strong>
+                    </div>
+                    <span class="badge bg-light text-dark border font-monospace">Order #{{ order.order_code }}</span>
+                </div>
+                <div class="ps-4 small text-muted">
+                    <strong class="text-dark">{{ order.full_name }}</strong> • {{ order.email }}<br>
+                    {{ order.shipping_address }}
                 </div>
             </div>
 
-            <!-- Billing Form -->
-            <form method="POST" action="{% url 'process_order' %}">
-                {% csrf_token %}
-                <div class="card">
-                    <div class="card-header">Enter Your Card Details</div>
-                    <div class="card-body">
-                        {{ billing_form.as_p }}
-                    </div>
+            <!-- Payment Methods Card -->
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden bg-white mb-4">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-wallet2 text-primary me-2"></i>Choose Payment Method</h5>
                 </div>
-                <br/>
-                <button class="btn btn-success w-100">Pay Now</button>
-            </form>
+                <div class="card-body p-4">
+                    
+                    <!-- Online Payment Option (Razorpay / UPI / Cards) -->
+                    <div class="p-3 border rounded-3 mb-3 bg-light bg-opacity-50">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-lightning-charge-fill text-warning fs-4"></i>
+                                <div>
+                                    <strong class="text-dark d-block">Razorpay Online Payment (UPI / QR / Cards / NetBanking)</strong>
+                                    <small class="text-muted">Pay securely using Google Pay, PhonePe, Paytm, BHIM, Cards, or NetBanking</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-success">Instant</span>
+                        </div>
+
+                        <!-- Razorpay Checkout Trigger Button -->
+                        <button id="rzp-button-pay" class="btn btn-swiggy btn-lg w-100 py-3 mt-2 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                            <i class="bi bi-lock-fill"></i>
+                            <span>Pay ₹{{ totals }} with Razorpay</span>
+                        </button>
+                    </div>
+
+                    <!-- Cash on Delivery Option -->
+                    <div class="p-3 border rounded-3 bg-light bg-opacity-50">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-truck text-success fs-4"></i>
+                                <div>
+                                    <strong class="text-dark d-block">Pay on Delivery (Cash / UPI at Doorstep)</strong>
+                                    <small class="text-muted">Pay cash or scan delivery agent's UPI QR when order arrives</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form method="POST" action="{% url 'process_cod' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <button type="submit" class="btn btn-outline-dark btn-lg w-100 py-3 mt-2 fw-bold d-flex align-items-center justify-content-center gap-2">
+                                <i class="bi bi-check2-circle fs-5"></i>
+                                <span>Place Order with Cash on Delivery (₹{{ totals }})</span>
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
 
         </div>
+
+        <!-- RIGHT COLUMN: BILL DETAILS & ORDER SUMMARY -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 rounded-4 p-4 bg-white sticky-top" style="top: 90px;">
+                <h6 class="fw-bold text-dark border-bottom pb-3 mb-3">
+                    <i class="bi bi-receipt me-2 text-primary"></i>Bill Details
+                </h6>
+
+                <div class="d-flex justify-content-between text-muted small mb-2">
+                    <span>Item Total</span>
+                    <span class="text-dark fw-semibold">₹{{ totals }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between text-muted small mb-2">
+                    <span>Delivery Partner Fee</span>
+                    <span class="text-success fw-bold">FREE</span>
+                </div>
+
+                <div class="d-flex justify-content-between text-muted small mb-3">
+                    <span>Platform & Govt Taxes</span>
+                    <span class="text-dark">₹0.00</span>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="fw-bold fs-5 text-dark">TO PAY</span>
+                    <span class="fw-bold fs-4 text-success">₹{{ totals }}</span>
+                </div>
+
+                <div class="p-3 bg-light rounded-3 small text-muted">
+                    <i class="bi bi-shield-lock-fill text-success me-1"></i>
+                    <strong>100% Safe & Secure Payments:</strong> Protected by Razorpay 256-Bit SSL encryption & HMAC-SHA256 Server Verification.
+                </div>
+            </div>
+        </div>
+
     </div>
+
 </div>
+
+<!-- HIDDEN FORMS FOR SERVER-SIDE VERIFICATION -->
+<form id="rzp-verify-form" action="{% url 'payment_verify' %}" method="POST" style="display:none;">
+    {% csrf_token %}
+    <input type="hidden" name="razorpay_order_id" id="verify_order_id" value="{{ razorpay_order_id }}">
+    <input type="hidden" name="razorpay_payment_id" id="verify_payment_id" value="">
+    <input type="hidden" name="razorpay_signature" id="verify_signature" value="">
+    <input type="hidden" name="payment_method" id="verify_method" value="Razorpay Online (UPI/Cards)">
+</form>
+
+<form id="rzp-failure-form" action="{% url 'payment_failed' %}" method="POST" style="display:none;">
+    {% csrf_token %}
+    <input type="hidden" name="razorpay_order_id" value="{{ razorpay_order_id }}">
+    <input type="hidden" name="error_code" id="fail_error_code" value="PAYMENT_DECLINED">
+    <input type="hidden" name="error_description" id="fail_error_description" value="Payment declined in checkout.">
+    <input type="hidden" name="razorpay_payment_id" id="fail_payment_id" value="">
+</form>
+
+<!-- OFFICIAL RAZORPAY CHECKOUT SDK SCRIPT -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    var rzpOptions = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ amount_in_paise }}",
+        "currency": "{{ currency }}",
+        "name": "FinPayCommerce",
+        "description": "Order #{{ order.order_code }}",
+        {% if razorpay_order_id %}
+        "order_id": "{{ razorpay_order_id }}",
+        {% endif %}
+        "handler": function (response) {
+            console.log("Razorpay Gateway Success Response:", response);
+            document.getElementById('verify_order_id').value = response.razorpay_order_id || "{{ razorpay_order_id }}";
+            document.getElementById('verify_payment_id').value = response.razorpay_payment_id;
+            document.getElementById('verify_signature').value = response.razorpay_signature || "";
+            document.getElementById('verify_method').value = "Razorpay Online (UPI/Cards)";
+            document.getElementById('rzp-verify-form').submit();
+        },
+        "prefill": {
+            "name": "{{ order.full_name }}",
+            "email": "{{ order.email }}",
+            "contact": "9524686869"
+        },
+        "theme": {
+            "color": "#fc8019"
+        },
+        "modal": {
+            "backdropclose": false,
+            "escape": false,
+            "ondismiss": function() {
+                console.log("Razorpay Checkout dismissed.");
+            }
+        }
+    };
+
+    var rzpInstance = null;
+    try {
+        rzpInstance = new Razorpay(rzpOptions);
+        rzpInstance.on('payment.failed', function (response) {
+            console.warn("Razorpay Payment Notice:", response.error);
+            document.getElementById('fail_error_code').value = response.error.code || 'PAYMENT_FAILED';
+            document.getElementById('fail_error_description').value = response.error.description || 'Payment declined by gateway';
+            document.getElementById('fail_payment_id').value = response.error.metadata ? response.error.metadata.payment_id : '';
+            document.getElementById('rzp-failure-form').submit();
+        });
+    } catch(e) {
+        console.error("Razorpay initialization error:", e);
+    }
+
+    document.getElementById('rzp-button-pay').onclick = function (e) {
+        e.preventDefault();
+        if (rzpInstance) {
+            rzpInstance.open();
+        } else {
+            try {
+                var rzp = new Razorpay(rzpOptions);
+                rzp.open();
+            } catch(err) {
+                alert("Payment gateway could not load. Please check your internet connection.");
+            }
+        }
+    };
+</script>
+
 {% endblock %}

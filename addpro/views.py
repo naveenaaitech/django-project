@@ -101,24 +101,27 @@ def logout_user(request):
     return redirect('home')
 
 def search(request):
-    if request.method == "POST":
-        searched = request.POST.get('searched', '').strip()
+    searched = (request.GET.get('searched') or request.POST.get('searched', '')).strip()
 
-        if searched == "":
-            messages.warning(request, "Please enter a product name.")
-            return render(request, "search.html", {})
-
+    if searched:
         products = Product.objects.filter(
-            Q(name__icontains=searched) | Q(description__icontains=searched)
-        )
+            Q(name__icontains=searched) | 
+            Q(description__icontains=searched) |
+            Q(category__name__icontains=searched)
+        ).distinct()
+        return render(request, "search.html", {
+            'searched': products, 
+            'query': searched, 
+            'has_query': True
+        })
 
-        if not products:
-            messages.error(request, "No matching products found.")
-            return render(request, "search.html", {})
-
-        return render(request, "search.html", {'searched': products})
-
-    return render(request, "search.html", {})
+    # If user opens /search/ without query, show all products to explore
+    all_products = Product.objects.all()
+    return render(request, "search.html", {
+        'searched': all_products, 
+        'query': '', 
+        'has_query': False
+    })
 
 
 from .models import Product, Category

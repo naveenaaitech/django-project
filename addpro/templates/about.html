@@ -1,22 +1,48 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load static %}
 
 {% block content %}
 
-<header class="bg-dark py-5">
-    <div class="container">
-        <div class="text-center text-white">
-            <h1 class="display-4 fw-bolder">About Us</h1>
-            <p class="lead text-white-50">Welcome to our Ecommerce website.</p>
-        </div>
+<header class="py-5 text-white shadow-sm" style="background: linear-gradient(135deg, #09172e 0%, #0d2346 100%);">
+    <div class="container text-center py-3">
+        <span class="badge bg-primary bg-opacity-25 text-info border border-info border-opacity-25 rounded-pill px-3 py-2 fw-medium mb-3">
+            FinTech Architecture Demo
+        </span>
+        <h1 class="display-4 fw-bold">About FinPayCommerce</h1>
+        <p class="lead text-white-50 max-w-2xl mx-auto">An enterprise demonstration platform showing the end-to-end lifecycle of digital payment gateway operations.</p>
     </div>
 </header>
 
-<div class="container mt-5 mb-5">
-    <p align="justify">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec id mauris ut nisl elementum dapibus.
-        Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae.
-    </p>
+<div class="container py-5">
+    <div class="row g-4 justify-content-center">
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 p-4 border-0 shadow-sm">
+                <div class="display-6 text-primary mb-3"><i class="bi bi-shield-lock-fill"></i></div>
+                <h5 class="fw-bold">Payment Gateway Engine</h5>
+                <p class="text-muted small">
+                    Integrated with Razorpay Test Mode API, demonstrating order creation, smallest currency unit (Paise) conversion, and modal checkout.
+                </p>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 p-4 border-0 shadow-sm">
+                <div class="display-6 text-success mb-3"><i class="bi bi-cpu-fill"></i></div>
+                <h5 class="fw-bold">Server-Side Verification</h5>
+                <p class="text-muted small">
+                    Every transaction is mathematically verified using HMAC-SHA256 cryptographic signatures to protect against client-side tampering.
+                </p>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 p-4 border-0 shadow-sm">
+                <div class="display-6 text-info mb-3"><i class="bi bi-journal-check"></i></div>
+                <h5 class="fw-bold">Audit-Ready Ledger</h5>
+                <p class="text-muted small">
+                    Maintains immutable transaction records separate from e-commerce order statuses with duplicate charge prevention (idempotency).
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

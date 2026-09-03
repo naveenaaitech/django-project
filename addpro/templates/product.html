@@ -1,56 +1,77 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container mt-4">
+<header class="py-3 text-white shadow-sm mb-4" style="background: linear-gradient(135deg, #09172e 0%, #0d2346 100%);">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white-50 text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item"><a href="#" class="text-white-50 text-decoration-none">{{ product.category.name|default:'Products' }}</a></li>
+                <li class="breadcrumb-item active text-white" aria-current="page">{{ product.name }}</li>
+            </ol>
+        </nav>
+    </div>
+</header>
 
-    <div class="card mb-3 shadow">
-        <div class="row g-0">
-
+<div class="container py-4 mb-5">
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="row g-0 align-items-center">
+            
             <!-- Product Image -->
-            <div class="col-md-4">
-                <img src="{{ product.image.url }}" class="img-fluid rounded-start" alt="Product Image">
+            <div class="col-lg-5 p-4 text-center bg-light">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="img-fluid rounded-3 shadow-sm" alt="{{ product.name }}" style="max-height: 400px; object-fit: cover;">
+                {% else %}
+                <div class="py-5"><i class="bi bi-image fs-1 text-muted"></i></div>
+                {% endif %}
             </div>
 
             <!-- Product Information -->
-            <div class="col-md-8">
-                <div class="card-body text-center">
+            <div class="col-lg-7 p-4 p-md-5">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 mb-2">
+                    {{ product.category.name|default:'Verified Store Item' }}
+                </span>
 
-                    <h3 class="card-title fw-bold">{{ product.name }}</h3>
-                    <p class="card-text mt-3">{{ product.description }}</p>
+                <h2 class="fw-bold text-dark mb-2">{{ product.name }}</h2>
 
+                <!-- Price Display -->
+                <div class="mb-3">
                     {% if product.is_sale %}
-                        <!-- Sale Badge -->
-                        <div class="d-flex justify-content-center small text-warning mb-2">
-                            <div class="bi-star-fill"></div>
-                            &nbsp;&nbsp;Sale!&nbsp;&nbsp;
-                            <div class="bi-star-fill"></div>
-                        </div>
-
-                        <!-- Sale Price -->
-                        <strike class="text-danger fw-bold">${{ product.price }}</strike>
-                        &nbsp;
-                        <span class="text-success fw-bold">${{ product.sale_price }}</span>
-
+                    <span class="badge bg-danger me-2">SALE ACTIVE</span>
+                    <span class="text-muted text-decoration-line-through h5 me-2">₹{{ product.price }}</span>
+                    <span class="text-danger fw-bold h3 mb-0">₹{{ product.sale_price }}</span>
                     {% else %}
-                        <!-- Normal Price -->
-                        <span class="fw-bold fs-5">${{ product.price }}</span>
+                    <span class="fw-bold text-primary h3 mb-0">₹{{ product.price }}</span>
                     {% endif %}
-
-                    <!-- Wishlist Button -->
-                    <div class="mt-3">
-                        <button type="button" value="{{ product.id }}" class="btn btn-secondary" id="add-wishlist">
-                            Add to Wishlist
-                        </button>
-                    </div>
-
-                    <!-- Home Button -->
-                    <div class="mt-3">
-                        <a href="{% url 'home' %}" class="btn btn-dark">Back to Home</a>
-                    </div>
-
                 </div>
-            </div>
 
+                <p class="text-muted lead fs-6 mb-4">
+                    {{ product.description|default:'High-quality verified item available for instant purchase with Razorpay test checkout or Cash on Delivery.' }}
+                </p>
+
+                <!-- Action Buttons -->
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <a href="{% url 'cart_add' product.id %}" class="btn btn-primary btn-lg px-4 fw-bold shadow-sm d-flex align-items-center gap-2">
+                        <i class="bi bi-cart-plus-fill"></i> Add to Cart
+                    </a>
+                    <button type="button" value="{{ product.id }}" class="btn btn-outline-danger btn-lg px-4" id="add-wishlist">
+                        <i class="bi bi-heart"></i> Wishlist
+                    </button>
+                </div>
+
+                <!-- FinTech Features -->
+                <div class="p-3 bg-light rounded-3 border small text-muted">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <i class="bi bi-shield-check text-success me-1"></i> <strong>Razorpay Test Mode:</strong> Cards / UPI / GPay
+                        </div>
+                        <div class="col-md-6">
+                            <i class="bi bi-truck text-primary me-1"></i> <strong>Cash on Delivery:</strong> Available
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>

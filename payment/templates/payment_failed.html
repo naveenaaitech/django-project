@@ -1,0 +1,96 @@
+﻿{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            
+            <div class="card shadow border-0 rounded-4 overflow-hidden">
+                
+                <!-- Failed Header Banner -->
+                <div class="card-header bg-danger bg-gradient text-white text-center py-4">
+                    <div class="display-4 mb-2">✕</div>
+                    <h3 class="fw-bold mb-1">Payment Failed / Cancelled</h3>
+                    <p class="mb-0 text-white-50">The transaction could not be completed or authorization was declined.</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    
+                    <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                        <div>
+                            <strong>Payment Not Captured:</strong> Your card/account was not debited. The e-commerce order remains in <strong>PAYMENT_FAILED</strong> status.
+                        </div>
+                    </div>
+
+                    <!-- Failure Details -->
+                    <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                        <i class="bi bi-info-circle"></i> Failure Diagnostic Information
+                    </h5>
+
+                    <div class="table-responsive mb-4">
+                        <table class="table table-borderless table-sm">
+                            <tbody>
+                                <tr>
+                                    <td class="text-muted" style="width: 45%;">Order Reference:</td>
+                                    <td class="fw-bold text-dark">
+                                        {% if order %}{{ order.order_code }}{% else %}N/A{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Payment Status:</td>
+                                    <td><span class="badge bg-danger">FAILED</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Order Status:</td>
+                                    <td><span class="badge bg-warning text-dark">{% if order %}{{ order.get_order_status_display }}{% else %}PAYMENT_FAILED{% endif %}</span></td>
+                                </tr>
+                                {% if transaction.error_code %}
+                                <tr>
+                                    <td class="text-muted">Error Code:</td>
+                                    <td><code>{{ transaction.error_code }}</code></td>
+                                </tr>
+                                {% endif %}
+                                {% if transaction.error_description %}
+                                <tr>
+                                    <td class="text-muted">Reason:</td>
+                                    <td class="text-danger small">{{ transaction.error_description }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- FinTech Concept Note -->
+                    <div class="card bg-light border-0 mb-4 p-3 small">
+                        <h6 class="fw-bold mb-1 text-dark"><i class="bi bi-lightbulb-fill text-warning"></i> FinTech Concept: Idempotency & Order Preservation</h6>
+                        <p class="text-muted mb-0">
+                            When an online payment fails, the e-commerce application preserves the existing order ID and allows the customer to retry payment using a fresh gateway attempt, without creating messy duplicate orders in the database.
+                        </p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        {% if order %}
+                        <a href="{% url 'billing_info' %}?order_id={{ order.id }}" class="btn btn-primary btn-lg px-4 fw-bold">
+                            <i class="bi bi-arrow-repeat"></i> Retry Payment
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'cart_summary' %}" class="btn btn-outline-secondary btn-lg px-4">
+                            <i class="bi bi-cart"></i> Return to Cart
+                        </a>
+                    </div>
+
+                </div>
+
+                <div class="card-footer bg-light text-center text-muted small py-3">
+                    Razorpay Test Mode | Payment Retry Demonstration
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

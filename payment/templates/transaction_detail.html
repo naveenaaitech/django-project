@@ -1,0 +1,195 @@
+﻿{% extends 'base.html' %}
+{% block content %}
+
+<header class="bg-primary text-white py-4 mb-4 shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold mb-0"><i class="bi bi-file-earmark-code"></i> FinTech Transaction Diagnostic</h2>
+            <p class="text-white-50 mb-0 small">Educational Breakdown: Application vs Gateway Identifiers</p>
+        </div>
+        <div>
+            <a href="{% url 'payment_history' %}" class="btn btn-outline-light btn-sm me-2">
+                <i class="bi bi-clock-history"></i> Payment History
+            </a>
+            <a href="{% url 'home' %}" class="btn btn-light btn-sm">
+                <i class="bi bi-house"></i> Home
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="container mb-5">
+    
+    <div class="row">
+        
+        <!-- LEFT COLUMN: IDENTIFIERS & COMPARISON -->
+        <div class="col-lg-7 mb-4">
+            
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-dark text-white fw-bold">
+                    <i class="bi bi-diagram-3-fill"></i> Financial Entity Mapping
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Entity Concept</th>
+                                <th>Scope</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Transaction Reference</strong></td>
+                                <td><span class="badge bg-primary">Internal Application</span></td>
+                                <td><code class="fs-6">{{ transaction.transaction_id }}</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>E-Commerce Order</strong></td>
+                                <td><span class="badge bg-primary">Internal Application</span></td>
+                                <td><span class="badge bg-dark fs-6">{{ order.order_code }}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Gateway Order ID</strong></td>
+                                <td><span class="badge bg-info text-dark">Razorpay Gateway</span></td>
+                                <td><small><code>{{ transaction.razorpay_order_id }}</code></small></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Gateway Payment ID</strong></td>
+                                <td><span class="badge bg-info text-dark">Razorpay Gateway</span></td>
+                                <td>
+                                    {% if transaction.razorpay_payment_id %}
+                                        <small><code>{{ transaction.razorpay_payment_id }}</code></small>
+                                    {% else %}
+                                        <span class="text-muted"><em>Not Captured</em></span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cryptographic Signature</strong></td>
+                                <td><span class="badge bg-secondary">HMAC-SHA256</span></td>
+                                <td>
+                                    {% if transaction.razorpay_signature %}
+                                        <small class="text-break"><code>{{ transaction.razorpay_signature|truncatechars:35 }}</code></small>
+                                    {% else %}
+                                        <span class="text-muted"><em>N/A</em></span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Line items table -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-secondary text-white fw-bold">
+                    <i class="bi bi-cart-check-fill"></i> Purchased Order Items
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th class="ps-3">Product</th>
+                                <th>Qty</th>
+                                <th>Unit Price</th>
+                                <th class="text-end pe-3">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order_items %}
+                            <tr>
+                                <td class="ps-3 fw-bold">{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>₹{{ item.price }}</td>
+                                <td class="text-end pe-3 fw-bold">₹{{ item.total_price }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">No line items recorded.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <th colspan="3" class="text-end">Total Amount:</th>
+                                <th class="text-end pe-3 text-primary h5 mb-0">₹{{ order.amount_paid }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: FINANCIAL CONCEPTS & TIMELINE -->
+        <div class="col-lg-5">
+            
+            <!-- Status & Amount Card -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-dark text-white fw-bold">
+                    <i class="bi bi-cash-stack"></i> Monetary & Status Breakdown
+                </div>
+                <div class="card-body">
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <span class="text-muted">Payment Status:</span>
+                        {% if transaction.status == 'SUCCESS' %}
+                            <span class="badge bg-success fs-6">SUCCESS</span>
+                        {% elif transaction.status == 'FAILED' %}
+                            <span class="badge bg-danger fs-6">FAILED</span>
+                        {% elif transaction.status == 'REFUNDED' %}
+                            <span class="badge bg-purple text-white fs-6" style="background-color: #6f42c1;">REFUNDED</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark fs-6">{{ transaction.status }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <span class="text-muted">Order Status:</span>
+                        <span class="badge bg-info text-dark fs-6">{{ order.get_order_status_display }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <span class="text-muted">Amount in INR:</span>
+                        <span class="fw-bold text-dark fs-5">₹{{ transaction.amount }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <span class="text-muted">Amount in Paise:</span>
+                        <span class="fw-bold text-primary">{{ transaction.amount_in_paise }} paise</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Payment Method:</span>
+                        <span class="badge bg-secondary">{{ transaction.payment_method }}</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Classroom Teaching Notes Box -->
+            <div class="card border-warning shadow-sm">
+                <div class="card-header bg-warning bg-opacity-10 text-dark fw-bold">
+                    <i class="bi bi-mortarboard-fill"></i> Trainer Concept Reference
+                </div>
+                <div class="card-body small text-muted">
+                    <p class="mb-2">
+                        <strong>1. Separation of Concerns:</strong> <em>Payment Status</em> reflects whether funds were authorized by the bank. <em>Order Status</em> reflects fulfillment & shipping state.
+                    </p>
+                    <p class="mb-2">
+                        <strong>2. Smallest Currency Unit:</strong> Financial APIs require paise (integers) to prevent floating-point rounding errors during calculations.
+                    </p>
+                    <p class="mb-0">
+                        <strong>3. Cryptographic Proof:</strong> The backend computes <code>HMAC-SHA256(order_id + '|' + payment_id, secret_key)</code> and compares it to <code>signature</code> before marking the order as paid.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

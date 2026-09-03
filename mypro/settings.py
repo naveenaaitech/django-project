@@ -10,10 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -135,8 +140,48 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-import os
-MEDIA_URL = 'media/'     
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 ALLOWED_HOSTS = ['*']
+
+# Trusted origins for Render HTTPS domain
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+    'https://*.render.com',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+]
+
+# ==============================================================================
+# RAZORPAY PAYMENT GATEWAY SETTINGS (SUPPORTS TEST AND LIVE MODES)
+# ==============================================================================
+# In production, these values are loaded securely from environment variables (.env).
+# Supports RAZORPAY_KEY_ID=rzp_test_... (Test) or rzp_live_... (Live).
+# NEVER commit production secret keys to version control.
+RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID', '')
+RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', '')
+RAZORPAY_CURRENCY = os.getenv('RAZORPAY_CURRENCY', 'INR')
+RAZORPAY_WEBHOOK_SECRET = os.getenv('RAZORPAY_WEBHOOK_SECRET', '')
+
+# LOGGING CONFIGURATION
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '[%(asctime)s] %(levelname)s in %(name)s: %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',
+        },
+    },
+    'loggers': {
+        'payment': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
