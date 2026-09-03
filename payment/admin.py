@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.urls import reverse
 from .models import ShippingAddress, Order, OrderItem, PaymentTransaction
 
@@ -38,12 +39,12 @@ class OrderAdmin(admin.ModelAdmin):
     )
     list_filter = ('order_status', 'date_ordered')
     search_fields = ('id', 'full_name', 'email', 'razorpay_order_id', 'user__username')
-    readonly_fields = ('order_code', 'razorpay_order_id', 'date_ordered', 'updated_at')
+    readonly_fields = ('order_code', 'razorpay_order_id', 'paid_at', 'date_ordered', 'updated_at')
     inlines = [OrderItemInline, PaymentTransactionInline]
 
     fieldsets = (
         ('Order Identification', {
-            'fields': ('order_code', 'user', 'order_status')
+            'fields': ('order_code', 'user', 'order_status', 'paid_at')
         }),
         ('Customer & Shipping Information', {
             'fields': ('full_name', 'email', 'shipping_address')
@@ -77,10 +78,10 @@ class OrderAdmin(admin.ModelAdmin):
         if txn and txn.razorpay_payment_id:
             return format_html('<code style="color: #0369a1; font-weight: bold;">{}</code>', txn.razorpay_payment_id)
         elif txn and txn.status == 'SUCCESS':
-            return format_html('<span style="color: green; font-weight: bold;">✓ Verified</span>')
+            return mark_safe('<span style="color: green; font-weight: bold;">✓ Verified</span>')
         elif obj.order_status == 'PROCESSING':
-            return format_html('<span style="color: #b45309;">💵 Pay on Delivery</span>')
-        return format_html('<span style="color: #9ca3af;">Pending</span>')
+            return mark_safe('<span style="color: #b45309;">💵 Pay on Delivery</span>')
+        return mark_safe('<span style="color: #9ca3af;">Pending</span>')
     payment_proof_display.short_description = "Gateway Proof / Txn ID"
 
     def status_badge(self, obj):
