@@ -118,9 +118,12 @@ class Command(BaseCommand):
         ]
 
         for p_data in products_data:
-            Product.objects.get_or_create(
-                name=p_data['name'],
-                defaults=p_data
-            )
+            try:
+                Product.objects.get_or_create(
+                    name=p_data['name'],
+                    defaults=p_data
+                )
+            except Exception as e:
+                self.stdout.write(self.style.WARNING(f"Product setup notice for {p_data.get('name')}: {e}"))
 
         self.stdout.write(self.style.SUCCESS("Demo catalog & accounts initialized successfully!"))
