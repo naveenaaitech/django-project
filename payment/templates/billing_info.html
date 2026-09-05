@@ -188,6 +188,16 @@
 
     document.getElementById('rzp-button-pay').onclick = function (e) {
         e.preventDefault();
+        var orderId = "{{ razorpay_order_id }}";
+        var keyId = "{{ razorpay_key_id }}";
+        if (!keyId || keyId.trim() === "") {
+            alert("Payment Gateway Configuration: RAZORPAY_KEY_ID is missing on the server. Please add RAZORPAY_KEY_ID in your Render Environment settings.");
+            return;
+        }
+        if (!orderId || orderId.trim() === "") {
+            alert("Payment Gateway Notice: Server was unable to create an order with Razorpay. Please verify that RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in your Render Environment settings match your active Razorpay keys.");
+            return;
+        }
         if (rzp) {
             rzp.open();
         } else {
@@ -195,7 +205,7 @@
                 var newRzp = new Razorpay(rzpOptions);
                 newRzp.open();
             } catch(e) {
-                alert("Razorpay checkout is loading. Please check your internet connection.");
+                alert("Razorpay checkout could not load. Please check your internet connection.");
             }
         }
     };
