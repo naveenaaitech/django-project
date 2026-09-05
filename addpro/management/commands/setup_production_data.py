@@ -49,7 +49,7 @@ class Command(BaseCommand):
             cat, _ = Category.objects.get_or_create(name=cat_name)
             cat_objs[cat_name] = cat
 
-        # 4. Ensure Sample Products for Verification
+        # 4. Ensure Sample Products with Images
         products_data = [
             {
                 'name': 'Samsung Galaxy S24 Ultra',
@@ -57,6 +57,7 @@ class Command(BaseCommand):
                 'price': Decimal('129999.00'),
                 'is_sale': True,
                 'sale_price': Decimal('119999.00'),
+                'image': 'uploads/product/mobile.jpg',
                 'description': 'Flagship AI smartphone with 200MP camera and titanium build.'
             },
             {
@@ -65,6 +66,7 @@ class Command(BaseCommand):
                 'price': Decimal('134900.00'),
                 'is_sale': False,
                 'sale_price': Decimal('0.00'),
+                'image': 'uploads/product/0_Qfzh9dCW6754ydZ0.jpg',
                 'description': 'A17 Pro chip, Grade 5 titanium design, Action button.'
             },
             {
@@ -73,6 +75,7 @@ class Command(BaseCommand):
                 'price': Decimal('9995.00'),
                 'is_sale': True,
                 'sale_price': Decimal('7995.00'),
+                'image': 'uploads/product/shoe1.jpg',
                 'description': 'Responsive cushioning for daily running with engineered mesh upper.'
             },
             {
@@ -81,6 +84,7 @@ class Command(BaseCommand):
                 'price': Decimal('14999.00'),
                 'is_sale': False,
                 'sale_price': Decimal('0.00'),
+                'image': 'uploads/product/shoe2.jpg',
                 'description': 'Lightest Boost midsole ever with Continental rubber outsole.'
             },
             {
@@ -89,6 +93,7 @@ class Command(BaseCommand):
                 'price': Decimal('850.00'),
                 'is_sale': True,
                 'sale_price': Decimal('699.00'),
+                'image': 'uploads/product/cake1.jpg',
                 'description': 'Rich dark chocolate ganache layered with moist sponge.'
             },
             {
@@ -97,6 +102,7 @@ class Command(BaseCommand):
                 'price': Decimal('950.00'),
                 'is_sale': False,
                 'sale_price': Decimal('0.00'),
+                'image': 'uploads/product/cake3.jpg',
                 'description': 'Classic red velvet layered with premium vanilla cream cheese.'
             },
             {
@@ -105,6 +111,7 @@ class Command(BaseCommand):
                 'price': Decimal('250.00'),
                 'is_sale': True,
                 'sale_price': Decimal('199.00'),
+                'image': 'uploads/product/drink1.jpg',
                 'description': 'Steeped for 18 hours for a smooth, naturally sweet espresso flavor.'
             },
             {
@@ -113,16 +120,20 @@ class Command(BaseCommand):
                 'price': Decimal('2.00'),
                 'is_sale': False,
                 'sale_price': Decimal('0.00'),
+                'image': 'uploads/product/drink3.jpg',
                 'description': 'Low-value sample item for live gateway verification (₹2 INR).'
             }
         ]
 
         for p_data in products_data:
             try:
-                Product.objects.get_or_create(
+                prod, created = Product.objects.get_or_create(
                     name=p_data['name'],
                     defaults=p_data
                 )
+                if not created and not prod.image:
+                    prod.image = p_data.get('image', '')
+                    prod.save()
             except Exception as e:
                 self.stdout.write(self.style.WARNING(f"Product setup notice for {p_data.get('name')}: {e}"))
 
