@@ -148,8 +148,8 @@ ALLOWED_HOSTS = ['*']
 # In production, these values are loaded securely from environment variables (.env).
 # Supports RAZORPAY_KEY_ID=rzp_test_... (Test) or rzp_live_... (Live).
 # NEVER commit production secret keys to version control.
-RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID', 'rzp_live_TYFxkJl1z8sgMA')
-RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', 'z1ufcCTzfWNPJ3eJ6xsblpWT')
+RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID', 'rzp_live_TYGLR4aVg9Oem5')
+RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', 'Vla0OYneYvDOzdHK6NhJ552D')
 RAZORPAY_CURRENCY = os.getenv('RAZORPAY_CURRENCY', 'INR')
 RAZORPAY_WEBHOOK_SECRET = os.getenv('RAZORPAY_WEBHOOK_SECRET', '')
 
